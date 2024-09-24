@@ -1,45 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Italiaanse Werkwoorden Oefenen</title>
+    <title>Italiaans Oefen App</title>
     <link rel="stylesheet" href="style.css">
+    <script type="module" src="script.js" defer></script>
 </head>
 <body>
-    <h1>Oefen Italiaanse Werkwoorden</h1>
+    <h1>Italiaans Werkwoorden Oefen App</h1>
+    
+    <h2>Voeg een nieuw werkwoord toe</h2>
+    <form id="werkwoordForm">
+        <input type="text" id="nieuwWerkwoord" placeholder="Infinitief" required>
+        <input type="text" id="io" placeholder="1e persoon enkelvoud" required>
+        <input type="text" id="tu" placeholder="2e persoon enkelvoud" required>
+        <input type="text" id="lui_lei" placeholder="3e persoon enkelvoud" required>
+        <input type="text" id="noi" placeholder="1e persoon meervoud" required>
+        <input type="text" id="voi" placeholder="2e persoon meervoud" required>
+        <input type="text" id="loro" placeholder="3e persoon meervoud" required>
+        <button type="button" id="toevoegen">Voeg Werkwoord Toe</button>
+    </form>
 
-    <!-- Filter voor sterke/zwakke werkwoorden -->
-    <label for="filterType">Filter werkwoorden:</label>
-    <select id="filterType">
-        <option value="alle">Alle werkwoorden</option>
-        <option value="sterk">Sterke werkwoorden</option>
-        <option value="zwak">Zwakke werkwoorden</option>
-    </select>
-
-    <!-- Oefeningsectie -->
-    <div id="oefening">
-        <p id="vraag">Klik op start om een werkwoord te oefenen!</p>
-        <input type="text" id="antwoord" placeholder="Typ je antwoord hier...">
-        <button id="controleer">Controleer</button>
-        <p id="feedback"></p>
-    </div>
-
-    <button id="start">Start Oefening</button>
-
-    <!-- Formulier om nieuwe werkwoorden toe te voegen -->
-    <div id="voegWerkwoordToe">
-        <h2>Voeg een nieuw werkwoord toe</h2>
-        <input type="text" id="nieuwWerkwoord" placeholder="Infinitief">
-        <input type="text" id="io" placeholder="1e persoon enkelvoud (io)">
-        <input type="text" id="tu" placeholder="2e persoon enkelvoud (tu)">
-        <input type="text" id="lui_lei" placeholder="3e persoon enkelvoud (lui/lei)">
-        <input type="text" id="noi" placeholder="1e persoon meervoud (noi)">
-        <input type="text" id="voi" placeholder="2e persoon meervoud (voi)">
-        <input type="text" id="loro" placeholder="3e persoon meervoud (loro)">
-        <button id="toevoegen">Werkwoord toevoegen</button>
-    </div>
-
-    <script src="script.js"></script>
+    <h2>Gepubliceerde Werkwoorden</h2>
+    <div id="werkwoordenLijst"></div>
 </body>
 </html>
