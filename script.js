@@ -46,6 +46,7 @@ function haalWerkwoordenOp() {
           const werkwoord = data[key];
           lijstElement.innerHTML += `<p>${werkwoord.infinitief}: ${werkwoord.vervoegingen.io}, ${werkwoord.vervoegingen.tu}, ${werkwoord.vervoegingen.lui_lei}, ${werkwoord.vervoegingen.noi}, ${werkwoord.vervoegingen.voi}, ${werkwoord.vervoegingen.loro}</p>`;
         }
+        beginOefenen(data);  // Begin met oefenen
       } else {
         console.log("Geen werkwoorden gevonden.");
       }
@@ -55,21 +56,44 @@ function haalWerkwoordenOp() {
     });
 }
 
-// Event listener voor toevoegen werkwoord
-document.getElementById('toevoegen').addEventListener('click', function() {
-  const nieuwWerkwoord = {
-    infinitief: document.getElementById('nieuwWerkwoord').value,
-    vervoegingen: {
-      io: document.getElementById('io').value,
-      tu: document.getElementById('tu').value,
-      lui_lei: document.getElementById('lui_lei').value,
-      noi: document.getElementById('noi').value,
-      voi: document.getElementById('voi').value,
-      loro: document.getElementById('loro').value
-    }
-  };
-  voegWerkwoordToe(nieuwWerkwoord);
-});
+// Functie om te oefenen met een willekeurig werkwoord
+function beginOefenen(werkwoorden) {
+  const keys = Object.keys(werkwoorden);
+  const randomKey = keys[Math.floor(Math.random() * keys.length)];
+  const oefenWerkwoord = werkwoorden[randomKey];
 
-// Haal werkwoorden op bij laden van de pagina
-document.addEventListener('DOMContentLoaded', haalWerkwoordenOp);
+  document.getElementById('oefenWerkwoord').innerText = `Werkwoord: ${oefenWerkwoord.infinitief}`;
+  document.getElementById('oefenSectie').style.display = 'block';
+
+  document.getElementById('controleerAntwoorden').onclick = function() {
+    controleerAntwoorden(oefenWerkwoord);
+  };
+
+  document.getElementById('nieuwOefenWerkwoord').onclick = function() {
+    beginOefenen(werkwoorden);
+  };
+}
+
+// Functie om de antwoorden te controleren
+function controleerAntwoorden(oefenWerkwoord) {
+  const feedbackElement = document.getElementById('oefenFeedback');
+  const io = document.getElementById('oefenIo').value;
+  const tu = document.getElementById('oefenTu').value;
+  const luiLei = document.getElementById('oefenLuiLei').value;
+  const noi = document.getElementById('oefenNoi').value;
+  const voi = document.getElementById('oefenVoi').value;
+  const loro = document.getElementById('oefenLoro').value;
+
+  let feedback = "Resultaten: ";
+  feedback += io === oefenWerkwoord.vervoegingen.io ? "1e pers. enkelv. goed. " : "1e pers. enkelv. fout. ";
+  feedback += tu === oefenWerkwoord.vervoegingen.tu ? "2e pers. enkelv. goed. " : "2e pers. enkelv. fout. ";
+  feedback += luiLei === oefenWerkwoord.vervoegingen.lui_lei ? "3e pers. enkelv. goed. " : "3e pers. enkelv. fout. ";
+  feedback += noi === oefenWerkwoord.vervoegingen.noi ? "1e pers. meerv. goed. " : "1e pers. meerv. fout. ";
+  feedback += voi === oefenWerkwoord.vervoegingen.voi ? "2e pers. meerv. goed. " : "2e pers. meerv. fout. ";
+  feedback += loro === oefenWerkwoord.vervoegingen.loro ? "3e pers. meerv. goed. " : "3e pers. meerv. fout. ";
+
+  feedbackElement.innerText = feedback;
+}
+
+// Event listener voor toevoegen werkwoord
+document.getElementById('toevoegen').addEventListener('click', function()
