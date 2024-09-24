@@ -1,119 +1,75 @@
-// Lijst met werkwoorden en vervoegingen voor alle personen
-const werkwoorden = [
-    {
-        infinitief: "parlare",
-        type: "zwak",
-        vervoegingen: {
-            io: "parlo",
-            tu: "parli",
-            lui_lei: "parla",
-            noi: "parliamo",
-            voi: "parlate",
-            loro: "parlano"
-        }
-    },
-    {
-        infinitief: "andare",
-        type: "sterk",
-        vervoegingen: {
-            io: "vado",
-            tu: "vai",
-            lui_lei: "va",
-            noi: "andiamo",
-            voi: "andate",
-            loro: "vanno"
-        }
-    },
-    {
-        infinitief: "mangiare",
-        type: "zwak",
-        vervoegingen: {
-            io: "mangio",
-            tu: "mangi",
-            lui_lei: "mangia",
-            noi: "mangiamo",
-            voi: "mangiate",
-            loro: "mangiano"
-        }
-    }
-    // Voeg meer werkwoorden toe als je wilt
-];
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import { getDatabase, ref, set, get } from "firebase/database";
 
-let huidigWerkwoord = null;
-let personen = ["io", "tu", "lui_lei", "noi", "voi", "loro"];
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyD9JQg87ftbYgJx6dj51SDXgBwDWUgENJ8",
+  authDomain: "italiaans-oefenapp.firebaseapp.com",
+  databaseURL: "https://italiaans-oefenapp-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "italiaans-oefenapp",
+  storageBucket: "italiaans-oefenapp.appspot.com",
+  messagingSenderId: "723444937647",
+  appId: "1:723444937647:web:6558cd487e4d851f90755a",
+  measurementId: "G-22QNVQH9M2"
+};
 
-// Functie om een willekeurig werkwoord te kiezen en de vraag te stellen
-function startOefening() {
-    const filter = document.getElementById('filterType').value;
-    let gefilterdeWerkwoorden = werkwoorden;
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = getDatabase(app);
 
-    // Filter werkwoorden op sterk of zwak
-    if (filter !== "alle") {
-        gefilterdeWerkwoorden = werkwoorden.filter(w => w.type === filter);
-    }
-
-    let randomWerkwoordIndex = Math.floor(Math.random() * gefilterdeWerkwoorden.length);
-    let randomPersoonIndex = Math.floor(Math.random() * personen.length);
-
-    huidigWerkwoord = gefilterdeWerkwoorden[randomWerkwoordIndex];
-    let persoon = personen[randomPersoonIndex];
-
-    // Stel de vraag op basis van de willekeurige persoon en het werkwoord
-    document.getElementById('vraag').innerText = `Wat is de vervoeging van "${huidigWerkwoord.infinitief}" voor "${persoon}"?`;
-    huidigWerkwoord.correctAntwoord = huidigWerkwoord.vervoegingen[persoon];
-
-    // Reset de feedback
-    document.getElementById('feedback').innerText = "";
+// Functie om werkwoorden op te slaan
+function voegWerkwoordToe(nieuwWerkwoord) {
+  const werkwoordRef = ref(db, 'werkwoorden/' + nieuwWerkwoord.infinitief);
+  set(werkwoordRef, nieuwWerkwoord)
+    .then(() => {
+      console.log("Werkwoord toegevoegd:", nieuwWerkwoord);
+      haalWerkwoordenOp();  // Herlaad de lijst van werkwoorden
+    })
+    .catch((error) => {
+      console.error("Error toevoegen werkwoord:", error);
+    });
 }
 
-// Functie om het antwoord te controleren
-function controleerAntwoord() {
-    const antwoord = document.getElementById('antwoord').value;
-    const feedback = document.getElementById('feedback');
-
-    if (antwoord === huidigWerkwoord.correctAntwoord) {
-        feedback.innerText = "Correct!";
-        feedback.style.color = "green";
-    } else {
-        feedback.innerText = `Fout! Het juiste antwoord is: ${huidigWerkwoord.correctAntwoord}`;
-        feedback.style.color = "red";
-    }
-
-    document.getElementById('antwoord').value = ""; // Leeg het invoerveld
+// Functie om werkwoorden op te halen
+function haalWerkwoordenOp() {
+  const werkwoordenRef = ref(db, 'werkwoorden/');
+  get(werkwoordenRef)
+    .then((snapshot) => {
+      const lijstElement = document.getElementById('werkwoordenLijst');
+      lijstElement.innerHTML = '';  // Maak de lijst leeg
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        for (const key in data) {
+          const werkwoord = data[key];
+          lijstElement.innerHTML += `<p>${werkwoord.infinitief}: ${werkwoord.vervoegingen.io}, ${werkwoord.vervoegingen.tu}, ${werkwoord.vervoegingen.lui_lei}, ${werkwoord.vervoegingen.noi}, ${werkwoord.vervoegingen.voi}, ${werkwoord.vervoegingen.loro}</p>`;
+        }
+      } else {
+        console.log("Geen werkwoorden gevonden.");
+      }
+    })
+    .catch((error) => {
+      console.error("Error ophalen werkwoorden:", error);
+    });
 }
 
-// Event Listener voor de knop 'Start Oefening'
-document.getElementById('start').addEventListener('click', startOefening);
-
-// Event Listener voor de knop 'Controleer'
-document.getElementById('controleer').addEventListener('click', controleerAntwoord);
-
-// Functie om een nieuw werkwoord toe te voegen
+// Event listener voor toevoegen werkwoord
 document.getElementById('toevoegen').addEventListener('click', function() {
-    const nieuwWerkwoord = {
-        infinitief: document.getElementById('nieuwWerkwoord').value,
-        type: "zwak", // Je kunt hier een extra veld toevoegen om type te kiezen als je wilt
-        vervoegingen: {
-            io: document.getElementById('io').value,
-            tu: document.getElementById('tu').value,
-            lui_lei: document.getElementById('lui_lei').value,
-            noi: document.getElementById('noi').value,
-            voi: document.getElementById('voi').value,
-            loro: document.getElementById('loro').value
-        }
-    };
-
-    // Voeg het nieuwe werkwoord toe aan de lijst
-    werkwoorden.push(nieuwWerkwoord);
-
-    // Leeg de invoervelden
-    document.getElementById('nieuwWerkwoord').value = "";
-    document.getElementById('io').value = "";
-    document.getElementById('tu').value = "";
-    document.getElementById('lui_lei').value = "";
-    document.getElementById('noi').value = "";
-    document.getElementById('voi').value = "";
-    document.getElementById('loro').value = "";
-
-    alert("Werkwoord toegevoegd!");
+  const nieuwWerkwoord = {
+    infinitief: document.getElementById('nieuwWerkwoord').value,
+    vervoegingen: {
+      io: document.getElementById('io').value,
+      tu: document.getElementById('tu').value,
+      lui_lei: document.getElementById('lui_lei').value,
+      noi: document.getElementById('noi').value,
+      voi: document.getElementById('voi').value,
+      loro: document.getElementById('loro').value
+    }
+  };
+  voegWerkwoordToe(nieuwWerkwoord);
 });
+
+// Haal werkwoorden op bij laden van de pagina
+document.addEventListener('DOMContentLoaded', haalWerkwoordenOp);
